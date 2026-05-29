@@ -57,13 +57,21 @@ runs:
       run: |
         set -euo pipefail
         TAG="${{ steps.create-tag.outputs.tag }}"
-        PR_JSON=$(gh pr list --label 'autorelease: pending' --state all --json number,title)
-        PRS=$(echo "${PR_JSON}" | jq -r --arg tag "${TAG}" '[.[] | select(.title | contains($tag)) | .number] | .[]')
+        REPO='${{ github.repository_owner }}/${{ github.event.repository.name }}'
+        PENDING='autorelease: pending'
+        TAGGED='autorelease: tagged'
+        PR_JSON=$(gh pr -R "${REPO}" list \
+          --label "${PENDING}" --state all \
+          --json number,title)
+        PRS=$(echo "${PR_JSON}" | jq -r --arg tag "${TAG}" \
+          '[.[] | select(.title | contains($tag)) | .number] | .[]')
         if [ -z "${PRS}" ]; then
-          echo "No release PR with 'autorelease: pending' label and '${TAG}' in title found, skip."
+          echo "No release PR with '${PENDING}' label and '${TAG}' in title found, skip."
           exit 0
         fi
         while IFS= read -r PR; do
-          gh pr edit "${PR}" --remove-label 'autorelease: pending' --add-label 'autorelease: tagged'
+          gh pr -R "${REPO}" edit "${PR}" \
+            --remove-label "${PENDING}" \
+            --add-label "${TAGGED}"
           echo "Release PR #${PR} labels updated."
         done <<< "${PRS}"
