@@ -12,13 +12,15 @@ inputs:
     default: ${{ github.token }}
   tag:
     description: Tag corresponding to the GitHub release
-    required: true
+    required: false
+    default: ${{ github.ref_name }}
 
 runs:
   using: composite
   steps:
     - name: Checkout
       uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      if: github.ref_type == 'tag'
       with:
         persist-credentials: false
 
