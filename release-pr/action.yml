@@ -51,6 +51,7 @@ runs:
         echo "Tag ${TAG} created successfully."
 
     - name: Update Release PR Labels
+      if: "${{ success() && startsWith(github.event.head_commit.message, 'chore(main): release') }}"
       env:
         GH_TOKEN: ${{ steps.app-token.outputs.token }}
       shell: bash
@@ -59,7 +60,6 @@ runs:
         TAG="${{ steps.create-tag.outputs.tag }}"
         REPO='${{ github.repository_owner }}/${{ github.event.repository.name }}'
         PENDING='autorelease: pending'
-        TAGGED='autorelease: tagged'
         PR_JSON=$(gh pr -R "${REPO}" list \
           --label "${PENDING}" --state all \
           --json number,title)
@@ -69,13 +69,7 @@ runs:
           echo "No release PR with '${PENDING}' label and '${TAG}' in title found, skip."
           exit 0
         fi
-        if ! gh label -R "${REPO}" list --json name -q '.[].name' | grep -qx "${TAGGED}"; then
-          gh label create "${TAGGED}" -R "${REPO}"
-          echo "Label '${TAGGED}' created."
-        fi
         while IFS= read -r PR; do
-          gh pr -R "${REPO}" edit "${PR}" \
-            --remove-label "${PENDING}" \
-            --add-label "${TAGGED}"
+          gh pr -R "${REPO}" edit "${PR}" --remove-label "${PENDING}"
           echo "Release PR #${PR} labels updated."
         done <<< "${PRS}"
