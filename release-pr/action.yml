@@ -41,7 +41,7 @@ runs:
         CONT="${API}/contents/.release-please-manifest.json"
         VERSION=$(gh api ${CONT} -H "Accept: application/vnd.github.raw" | jq -r '."."')
         TAG="v${VERSION}"
-        echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+        echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
         if gh api --silent "${API}/git/refs/tags/${TAG}" >/dev/null 2>&1; then
           echo "Tag ${TAG} already exists, skip."
           exit 0
@@ -57,16 +57,16 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        TAG="${{ steps.create-tag.outputs.tag }}"
+        VERSION="${{ steps.create-tag.outputs.version }}"
         REPO='${{ github.repository_owner }}/${{ github.event.repository.name }}'
         PENDING='autorelease: pending'
         PR_JSON=$(gh pr -R "${REPO}" list \
           --label "${PENDING}" --state all \
           --json number,title)
-        PRS=$(echo "${PR_JSON}" | jq -r --arg tag "${TAG}" \
+        PRS=$(echo "${PR_JSON}" | jq -r --arg tag "${VERSION}" \
           '[.[] | select(.title | contains($tag)) | .number] | .[]')
         if [ -z "${PRS}" ]; then
-          echo "No release PR with '${PENDING}' label and '${TAG}' in title found, skip."
+          echo "No release PR with '${PENDING}' label and '${VERSION}' in title found, skip."
           exit 0
         fi
         while IFS= read -r PR; do
