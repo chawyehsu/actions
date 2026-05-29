@@ -3,7 +3,12 @@ description: Open or update a release PR to bump and tag the version
 author: Chawye Hsu
 branding:
   icon: git-pull-request
-  color: black
+  color: white
+
+inputs:
+  token:
+    description: GitHub token for creating release PRs
+    required: true
 
 runs:
   using: composite
@@ -14,7 +19,7 @@ runs:
       if: github.repository_owner == 'chawyehsu' && github.event_name == 'push'
       with:
         client-id: "Iv23lifYx9gjogZQFf6X"
-        private-key: ${{ secrets.RELEASE_MAID_PRIVATE_KEY }}
+        private-key: ${{ inputs.token }}
         owner: ${{ github.repository_owner }}
         repositories: ${{ github.event.repository.name }}
 
