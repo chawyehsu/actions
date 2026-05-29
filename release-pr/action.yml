@@ -6,8 +6,8 @@ branding:
   color: white
 
 inputs:
-  token:
-    description: GitHub token for creating release PRs
+  private-key:
+    description: Private key of release maid bot to open release PRs
     required: true
 
 runs:
@@ -19,7 +19,7 @@ runs:
       if: github.repository_owner == 'chawyehsu' && github.event_name == 'push'
       with:
         client-id: "Iv23lifYx9gjogZQFf6X"
-        private-key: ${{ inputs.token }}
+        private-key: ${{ inputs.private-key }}
         owner: ${{ github.repository_owner }}
         repositories: ${{ github.event.repository.name }}
 
