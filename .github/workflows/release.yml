@@ -15,5 +15,3 @@ jobs:
     steps:
       - name: Draft Release
         uses: chawyehsu/actions/create-release@main
-        with:
-          tag: ${{ github.ref_name }}
