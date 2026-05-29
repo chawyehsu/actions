@@ -1,0 +1,57 @@
+name: Create Release
+description: Create a GitHub release with given context
+author: Chawye Hsu
+branding:
+  icon: package
+  color: purple
+
+inputs:
+  token:
+    description: GitHub token for creating GitHub Release
+    required: false
+    default: ${{ github.token }}
+  tag:
+    description: Tag corresponding to the GitHub release
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: Prepare Release Notes
+      shell: bash
+      run: |
+        TAG='${{ inputs.tag }}'
+        awk -v ver="${TAG#v}" '
+          /^## \[/ {
+            if (found) exit
+            if (index($0, "[" ver "]")) found = 1
+          }
+          found { print }
+        ' CHANGELOG.md > release-notes.md
+        cat release-notes.md
+
+    - name: Draft Release
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      shell: bash
+      run: |
+        TAG='${{ inputs.tag }}'
+        tag="v${TAG#v}"
+        REPO='${{ github.repository_owner }}/${{ github.event.repository.name }}'
+        gh release create "$tag" artifacts/* \
+          --title "$tag" --verify-tag --draft \
+          --notes-file release-notes.md \
+          --repo "${REPO}" \
+          || gh release upload "$tag" artifacts/* \
+            --repo "${REPO}" --clobber
