@@ -40,7 +40,7 @@ runs:
         CONT="${API}/contents/.release-please-manifest.json"
         VERSION=$(gh api ${CONT} -H "Accept: application/vnd.github.raw" | jq -r '."."')
         TAG="v${VERSION}"
-        if gh api --silent "${API}/git/refs/tags/${TAG}"; then
+        if gh api --silent "${API}/git/refs/tags/${TAG}" >/dev/null 2>&1; then
           echo "Tag ${TAG} already exists, skip."
           exit 0
         fi
