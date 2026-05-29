@@ -69,6 +69,10 @@ runs:
           echo "No release PR with '${PENDING}' label and '${TAG}' in title found, skip."
           exit 0
         fi
+        if ! gh label -R "${REPO}" list --json name -q '.[].name' | grep -qx "${TAGGED}"; then
+          gh label create "${TAGGED}" -R "${REPO}"
+          echo "Label '${TAGGED}' created."
+        fi
         while IFS= read -r PR; do
           gh pr -R "${REPO}" edit "${PR}" \
             --remove-label "${PENDING}" \
