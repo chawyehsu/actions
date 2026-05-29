@@ -41,7 +41,6 @@ runs:
           }
           found { print }
         ' CHANGELOG.md > release-notes.md
-        cat release-notes.md
 
     - name: Draft Release
       env:
@@ -51,9 +50,24 @@ runs:
         TAG='${{ inputs.tag }}'
         tag="v${TAG#v}"
         REPO='${{ github.repository_owner }}/${{ github.event.repository.name }}'
-        gh release create "$tag" artifacts/* \
+        shopt -s nullglob
+        assets=(artifacts/*)
+
+        if gh release create "$tag" "${assets[@]}" \
           --title "$tag" --verify-tag --draft \
           --notes-file release-notes.md \
-          --repo "${REPO}" \
-          || gh release upload "$tag" artifacts/* \
-            --repo "${REPO}" --clobber
+          --repo "${REPO}"; then
+          exit 0
+        fi
+
+        if gh release view "$tag" --repo "${REPO}" >/dev/null 2>&1; then
+          if [ ${#assets[@]} -gt 0 ]; then
+            gh release upload "$tag" "${assets[@]}" \
+              --repo "${REPO}" --clobber
+          else
+            echo "Release $tag already exists and no artifacts were found to upload."
+          fi
+        else
+          echo "Failed to create release and no existing release was found for $tag." >&2
+          exit 1
+        fi
