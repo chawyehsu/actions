@@ -14,6 +14,10 @@ inputs:
     description: Tag corresponding to the GitHub release
     required: false
     default: ${{ github.ref_name }}
+  checksums:
+    description: Generate and upload SHA-256 checksum files for artifacts
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -29,6 +33,19 @@ runs:
       with:
         path: artifacts
         merge-multiple: true
+
+    - name: Generate Checksums
+      if: inputs.checksums == 'true'
+      shell: bash
+      run: |
+        shopt -s nullglob
+        assets=(artifacts/*)
+
+        for asset in "${assets[@]}"; do
+          if [ -f "$asset" ]; then
+            sha256sum "$asset" | awk '{print $1}' > "$asset.sha256"
+          fi
+        done
 
     - name: Prepare Release Notes
       shell: bash
