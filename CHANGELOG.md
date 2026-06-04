@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/chawyehsu/actions/compare/v1.0.0...v1.1.0) (2026-06-04)
+
+
+### Features
+
+* **create-release:** add optional checksum generation for artifacts ([2ebe02e](https://github.com/chawyehsu/actions/commit/2ebe02e4eea235ab08a6151c4b41ed52046c73cf))
+
 ## [1.0.0](https://github.com/chawyehsu/actions/compare/v0.1.0...v1.0.0) (2026-05-29)
 
 
