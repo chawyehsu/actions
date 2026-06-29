@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/chawyehsu/actions/compare/v1.1.0...v1.2.0) (2026-06-29)
+
+
+### Features
+
+* **semantic-pr-title:** add PR title validation action ([2448d87](https://github.com/chawyehsu/actions/commit/2448d878771af38b61819bad04aa5e93391c6636))
+
 ## [1.1.0](https://github.com/chawyehsu/actions/compare/v1.0.0...v1.1.0) (2026-06-04)
 
 
