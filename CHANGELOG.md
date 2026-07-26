@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/chawyehsu/actions/compare/v1.2.0...v1.3.0) (2026-07-26)
+
+
+### Features
+
+* **create-release:** support source-only releases ([3d4f845](https://github.com/chawyehsu/actions/commit/3d4f84586df096eb48f99d69fcbfcec83b5fbca7))
+
 ## [1.2.0](https://github.com/chawyehsu/actions/compare/v1.1.0...v1.2.0) (2026-06-29)
 
 
